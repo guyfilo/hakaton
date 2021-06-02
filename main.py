@@ -7,15 +7,19 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from _datetime import datetime
+training_set_locations =[]
+
 
 def pre_proccing(name):
     # Use a breakpoint in the code line below to debug your script.
-    data_set = pd.read_csv("Dataset_crimes.csv")
+    training = pd.read_csv("test.csv")
+    
+
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    print_hi('PyCharm')
+    pre_proccing("a")
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 #hosafti comment
