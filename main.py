@@ -3,11 +3,15 @@
 
 # Press ⌃R to execute it or replace it with your code.
 # Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+import numpy as np
+import pandas as pd
+import matplotlib.pyplot as plt
+from _datetime import datetime
 
-
-def print_hi(name):
+def pre_proccing(name):
     # Use a breakpoint in the code line below to debug your script.
-    print("Hi, {0}".format(name))  # Press ⌘F8 to toggle the breakpoint.
+    data_set = pd.read_csv("Dataset_crimes.csv")
+
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
