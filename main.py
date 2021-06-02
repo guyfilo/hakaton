@@ -13,7 +13,8 @@ training_set_locations =[]
 def pre_proccing(name):
     # Use a breakpoint in the code line below to debug your script.
     training = pd.read_csv("test.csv")
-    
+    data['date'] = pd.to_datetime(data['date'], errors='coerce')
+    data['date'] = ((data['date'] - datetime(1970, 1, 1)).dt.total_seconds()) / (24 * 60 * 60)
 
 
 

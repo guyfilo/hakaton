@@ -5,4 +5,5 @@ from _datetime import datetime
 from sklearn.neighbors import KNeighborsClassifier
 training_set_locations =[]
 values = {"BATTERY":0, "THEFT":1, "CRIMINAL DAMAGE":2  ,"’DECEPTIVE PRACTICE":3 , "ASSAULT":4}
-def preproccesd
+def change_data(data_frame):
+
