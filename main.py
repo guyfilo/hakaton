@@ -14,6 +14,8 @@ def pre_proccing(name):
     training = pd.read_csv("test.csv")
     data['date'] = pd.to_datetime(data['date'], errors='coerce')
     data['date'] = ((data['date'] - datetime(1970, 1, 1)).dt.total_seconds()) / (24 * 60 * 60)
+    df['Date'] = pd.to_datetime(df['Date'], errors='coerce')
+    df['Hour'] = df['Date'].dt.hour
 
 
 
