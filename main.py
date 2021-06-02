@@ -8,8 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from _datetime import datetime
 training_set_locations =[]
-k
-mnkhl
+
 def pre_proccing(name):
     # Use a breakpoint in the code line below to debug your script.
     training = pd.read_csv("test.csv")
