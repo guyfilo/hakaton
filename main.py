@@ -22,15 +22,16 @@ def pre_proccing():
     df['Arrest'] = df['Arrest'].astype(int)
     df['Domestic'] = df['Domestic'].astype(int)
     df = pd.get_dummies(df, columns=['Block'], drop_first=True)
-    df.drop(columns=['id', 'price', 'long', 'lat'], inplace=True)
+    df.drop(columns=['IUCR', 'FBI Code', 'Description'], inplace=True)
     response_vector = df['Primary Type'].apply(lambda x: values[x]).to_numpy()
+    df.drop(columns=['Primary Type'], inplace=True)
     training_point = df.to_numpy()
     return training_point, response_vector
 
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    pre_proccing("a")
+    pre_proccing()
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 # hosafti comment
