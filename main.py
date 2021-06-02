@@ -8,6 +8,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from _datetime import datetime
 import location_filter
+from sklearn.tree import DecisionTreeClassifier
 
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
@@ -22,7 +23,7 @@ def pre_proccing():
     df['Arrest'] = df['Arrest'].astype(int)
     df['Domestic'] = df['Domestic'].astype(int)
     df = pd.get_dummies(df, columns=['Block'], drop_first=True)
-    df.drop(columns=['IUCR', 'FBI Code', 'Description'], inplace=True)
+    df.drop(columns=['IUCR', 'FBI Code', 'Description', 'Case Number'], inplace=True)
     response_vector = df['Primary Type'].apply(lambda x: values[x]).to_numpy()
     df.drop(columns=['Primary Type'], inplace=True)
     training_point = df.to_numpy()
@@ -31,7 +32,11 @@ def pre_proccing():
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
-    pre_proccing()
+    X, y = pre_proccing()
+    tree = DecisionTreeClassifier(max_depth=5)
+    scores = tree.fit(X, y).score(X, y)
+    print(scores)
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 # hosafti comment
