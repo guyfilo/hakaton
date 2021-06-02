@@ -3,10 +3,8 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from _datetime import datetime
 from sklearn.neighbors import KNeighborsClassifier
-
-training_set_locations = []
-values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
-
+training_set_locations =[]
+values = {"BATTERY":0, "THEFT":1, "CRIMINAL DAMAGE":2 ,"DECEPTIVE PRACTICE":3 , "ASSAULT":4}
 def change_data(data_frame):
     data_frame.dropna(inplace=True)
     response_vector = data_frame['Primary Type'].apply(lambda x: values[x]).to_numpy()
@@ -25,6 +23,7 @@ def create_list(x, y):
 
 if __name__ == '__main__':
     training = pd.read_csv("training set")
-    a ,b,c=change_data(training)
+    a,b,c = change_data(training)
+    pred = a.predict_proba(b)
 
-    print(a.score(b,c))
+
