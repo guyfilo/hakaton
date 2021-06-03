@@ -11,6 +11,7 @@ test_valid = df.drop(train.index)
 validation = test_valid.sample(frac=0.5, random_state=200)
 test = test_valid.drop(validation.index)
 
+
 pd.DataFrame.to_csv(train, "training set")
 pd.DataFrame.to_csv(validation, "validation set")
 pd.DataFrame.to_csv(test, "test set")

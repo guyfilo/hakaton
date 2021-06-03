@@ -1,17 +1,16 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import sklearn.model_selection
 import sklearn.tree as tr
-import sklearn.ensemble as en
 from location_filter import *
-
+import sklearn.ensemble as en
+import sklearn.tree as tr
+from sklearn.neighbors import KNeighborsClassifier
+from location_filter import *
+from sklearn.linear_model import LogisticRegression
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
 " features, column_title, feature_label='Primary Type', k=20"
-#(['X Coordinate', 'Y Coordinate'], 'block', 'Block'),(['X Coordinate', 'Y Coordinate'], 'beat', 'Beat')
-prod_feacture_args = [(['X Coordinate', 'Y Coordinate'], 'location', 'Primary Type', 10),
-                      (['DayTime'], 'dayTime', 'Primary Type', 30) ]
+# ,(['X Coordinate', 'Y Coordinate'], 'block', 'Block',1)(['X Coordinate', 'Y Coordinate'], 'beat', 'Beat',1)
+prod_feacture_args = [(['X Coordinate', 'Y Coordinate'], 'location', 'Primary Type', 100),
+                      (['DayTime'], 'dayTime', 'Primary Type', 100)]
 
 
 
@@ -20,7 +19,6 @@ class PreProcessing:
     def __init__(self, training_data):
         self.training_data = training_data
         self.prob_feature = [ProbFeature(*args) for args in prod_feacture_args]
-        print(type(self.prob_feature[0]))
         self.training_data =  self.basic_preprocessing(self.training_data)
 
 
@@ -58,7 +56,12 @@ if __name__ == '__main__':
     X, y = data_pro.load_new_features(data_pro.training_data, True)
     val = pd.read_csv('validation set')
     Xv, yv = data_pro.load_new_features(val, False)
-    tree = tr.DecisionTreeClassifier(max_depth=10)
+    p = en.BaggingClassifier(KNeighborsClassifier(n_neighbors=6),n_estimators=3)
+    print("tree")
+    p.fit(X, y)
+    print(p.score(X, y))
+    print(p.score(Xv, yv))
+    tree = en.BaggingClassifier(tr.DecisionTreeClassifier(max_depth=20),n_estimators=30)
     tree.fit(X, y)
     print("tree")
     print(tree.score(X, y))
