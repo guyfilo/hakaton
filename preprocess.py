@@ -11,6 +11,7 @@ from location_filter import *
 from sklearn.linear_model import LogisticRegression
 from BaiseNaive import *
 
+
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
 " features, column_title, feature_label='Primary Type', k=20"
@@ -70,8 +71,15 @@ if __name__ == '__main__':
     train = pd.read_csv('training set', index_col=0)
     data_pro = PreProcessing(train)
     X, y = data_pro.load_new_features(data_pro.training_data, True)
-    val = pd.read_csv('validation set', index_col=0)
+    print("finish training")
+    val = pd.read_csv('test set', index_col=0)
+    print(X.shape)
     Xv, yv = data_pro.load_new_features(val, False)
+    print("finish test")
+    tree = en.GradientBoostingClassifier(n_estimators=100, max_depth=15, max_features=40, random_state=100)
+    tree.fit(X,y)
+    print(tree.score(X,y))
+    print(tree.score(Xv, yv))
 
 
 
