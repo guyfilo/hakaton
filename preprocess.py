@@ -9,12 +9,14 @@ import sklearn.tree as tr
 from sklearn.neighbors import KNeighborsClassifier
 from location_filter import *
 from sklearn.linear_model import LogisticRegression
+from BaiseNaive import *
+
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
 " features, column_title, feature_label='Primary Type', k=20"
 # ,(['X Coordinate', 'Y Coordinate'], 'block', 'Block',1)(['X Coordinate', 'Y Coordinate'], 'beat', 'Beat',1)
 prod_feacture_args = [(['X Coordinate', 'Y Coordinate'], 'location', 'Primary Type', 100),
-                      (['DayTime'], 'dayTime', 'Primary Type', 100),(['X Coordinate', 'Y Coordinate'], 'beat', 'Beat',4)]
+                      (['DayTime'], 'dayTime', 'Primary Type', 100)]
 
 
 
@@ -23,7 +25,8 @@ class PreProcessing:
     def __init__(self, training_data):
         self.training_data = training_data
         self.prob_feature = [ProbFeature(*args) for args in prod_feacture_args]
-        self.training_data =  self.basic_preprocessing(self.training_data)
+        self.training_data = self.basic_preprocessing(self.training_data)
+        self.ld_prob = BayesNaive(self.training_data, 'Location Description')
 
 
     def basic_preprocessing(self, df):
@@ -36,9 +39,9 @@ class PreProcessing:
         df['Arrest'] = df['Arrest'].astype(int)
         df['Domestic'] = df['Domestic'].astype(int)
         df = pd.get_dummies(df, columns=[ 'WeekDay', 'Month', 'MonthDay'], drop_first=True)
-        df.drop(columns=['Date', 'Block', 'IUCR', 'FBI Code', 'Description', 'Case Number', 'Location Description', 'Updated On',
+        df.drop(columns=['Date', 'Block', 'IUCR', 'FBI Code', 'Description', 'Case Number', 'Updated On',
                          'Location'], inplace=True)
-
+        df['Primary Type'] = df['Primary Type'].apply(lambda x: values[x])
         return df
 
     def load_new_features(self, data, is_training):
@@ -47,12 +50,14 @@ class PreProcessing:
                 prob.fit(data)
         else:
             data = self.basic_preprocessing(data)
+            self.ld_prob.add_features(data)
         for prob in self.prob_feature:
             prob.add_features(data)
-        response_vector = data['Primary Type'].apply(lambda x: values[x])
-        data.drop(columns=['X Coordinate', 'Y Coordinate', 'DayTime', 'Beat', 'Primary Type'], inplace=True)
-        if not(is_training):
-            missing_cols =  set(self.training_data.columns)-set(data.columns)
+        response_vector = data['Primary Type']
+        data.drop(columns=['X Coordinate', 'Y Coordinate', 'DayTime', 'Beat', 'Primary Type', 'Location Description'],
+                  inplace=True)
+        if not is_training:
+            missing_cols = set(self.training_data.columns)-set(data.columns)
             # Add a missing column in test set with default value equal to 0
             for c in missing_cols:
                 data[c] = 0
@@ -62,26 +67,12 @@ class PreProcessing:
 
 
 if __name__ == '__main__':
-    train = pd.read_csv('training set')
+    train = pd.read_csv('training set', index_col=0)
     data_pro = PreProcessing(train)
     X, y = data_pro.load_new_features(data_pro.training_data, True)
-    val = pd.read_csv('validation set')
+    val = pd.read_csv('validation set', index_col=0)
     Xv, yv = data_pro.load_new_features(val, False)
-    p = en.BaggingClassifier(KNeighborsClassifier(n_neighbors=6),n_estimators=3)
-    print("tree")
-    p.fit(X, y)
-    print(p.score(X, y))
-    print(p.score(Xv, yv))
-    tree = en.BaggingClassifier(tr.DecisionTreeClassifier(max_depth=20),n_estimators=30)
-    tree.fit(X, y)
-    print("tree")
-    print(tree.score(X, y))
-    print(tree.score(Xv, yv))
-    rand_forest = en.RandomForestClassifier(n_estimators=200,max_depth=10)
-    rand_forest.fit(X,y)
-    print("rnd forest")
-    print(rand_forest.score(X, y))
-    print(rand_forest.score(Xv, yv))
+
 
 
 
