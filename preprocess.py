@@ -1,3 +1,7 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import sklearn.model_selection
 import sklearn.tree as tr
 from location_filter import *
 import sklearn.ensemble as en
@@ -72,7 +76,7 @@ if __name__ == '__main__':
     print(rand_forest.score(X, y))
     print(rand_forest.score(Xv, yv))
 
-
+שטויות בסוף
 
 
 
