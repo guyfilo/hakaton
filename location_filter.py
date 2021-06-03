@@ -44,14 +44,14 @@ def create_list(data, training):
 
 class ProbFeature:
 
-    def __init__(self, features, column_title, feature_label='Primary Type', k=20):
+    def __init__(self, features, column_title, feature_label='Primary Type', k=1):
+        self.type = None
         self.k = k
         self.location_model = None
         self.label_map = None
         self.features = features
         self.feature_label = feature_label
         self.column_title = column_title
-
 
     def fit(self, training_data):
         training_data.dropna(inplace=True)
