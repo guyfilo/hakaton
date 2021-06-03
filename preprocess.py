@@ -16,8 +16,8 @@ training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
 " features, column_title, feature_label='Primary Type', k=20"
 # ,(['X Coordinate', 'Y Coordinate'], 'block', 'Block',1)(['X Coordinate', 'Y Coordinate'], 'beat', 'Beat',1)
-prod_feacture_args = [(['X Coordinate', 'Y Coordinate'], 'location', 'Primary Type', 100),
-                      (['DayTime'], 'dayTime', 'Primary Type', 100)]
+prod_feacture_args = [(['X Coordinate', 'Y Coordinate'], 'location', 'Primary Type', 300),
+                      (['DayTime'], 'dayTime', 'Primary Type',100)]
 
 
 
@@ -37,10 +37,13 @@ class PreProcessing:
         df['WeekDay'] = time.dt.weekday
         df['Month'] = time.dt.month
         df['MonthDay'] = time.dt.day
+        df['Minute'] = time.dt.minute
+        df['Second'] = time.dt.second
         df['Arrest'] = df['Arrest'].astype(int)
         df['Domestic'] = df['Domestic'].astype(int)
-        df = pd.get_dummies(df, columns=[ 'WeekDay', 'Month', 'MonthDay'], drop_first=True)
-        df.drop(columns=['Date', 'Block', 'IUCR', 'FBI Code', 'Description', 'Case Number', 'Updated On',
+        df['Block'] = df['Block'].apply(self.calac_by_bloc)
+
+        df.drop(columns=['Date', 'IUCR', 'FBI Code', 'Description', 'Case Number', 'Updated On',
                          'Location'], inplace=True)
         df['Primary Type'] = df['Primary Type'].apply(lambda x: values[x])
         return df
@@ -66,17 +69,22 @@ class PreProcessing:
             data = data[self.training_data.columns]
         return data, response_vector
 
+    def calac_by_bloc(self, block):
+        n = int(block[:3])
+        d = 1 if block[6] in {'S','W'} else -1
+        return d*n
+
 
 if __name__ == '__main__':
     train = pd.read_csv('training set', index_col=0)
     data_pro = PreProcessing(train)
     X, y = data_pro.load_new_features(data_pro.training_data, True)
     print("finish training")
-    val = pd.read_csv('test set', index_col=0)
+    val = pd.read_csv('validation set', index_col=0)
     print(X.shape)
     Xv, yv = data_pro.load_new_features(val, False)
-    print("finish test")
-    tree = en.GradientBoostingClassifier(n_estimators=100, max_depth=15, max_features=40, random_state=100)
+    print("finish vl")
+    tree = en.RandomForestClassifier(n_estimators=200, max_depth=8)
     tree.fit(X,y)
     print(tree.score(X,y))
     print(tree.score(Xv, yv))
