@@ -33,7 +33,7 @@ if __name__ == '__main__':
     print("rnd forest")
     print(rand_forest.score(X, y))
     print(rand_forest.score(Xv, yv))
-jhkjhkj
+
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/
 # hosafti comment

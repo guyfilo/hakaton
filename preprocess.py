@@ -85,7 +85,7 @@ if __name__ == '__main__':
     print(X.shape)
     Xv, yv = data_pro.load_new_features(val, False)
     print("finish vl")
-    tree = en.StackingClassifier(estimators=[R])
+    tree = en.RandomForestClassifier(n_estimators=200, max_depth=15)
     tree.fit(X,y)
     print(Xv.shape)
     print(tree.score(X, y))

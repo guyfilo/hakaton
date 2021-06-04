@@ -58,7 +58,7 @@ class ProbFeature:
         self.label_map = {w: i for i, w in enumerate(training_data[self.feature_label].unique())}
         response_vector = training_data[self.feature_label].apply(lambda x: self.label_map[x])
         X = training_data[self.features]
-        k_neighbors = KNeighborsClassifier(n_neighbors=self.k, algorithm='kd_tree')
+        k_neighbors = KNeighborsClassifier(n_neighbors=self.k, algorithm='ball_tree', radius=500)
         k_neighbors.fit(X, response_vector)
         self.location_model = k_neighbors
 
