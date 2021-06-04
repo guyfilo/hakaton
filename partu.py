@@ -1,11 +1,7 @@
 import pandas as pd
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors
 from sklearn.cluster import OPTICS
-from sklearn.cluster import DBSCAN
-from sklearn.cluster import SpectralClustering
-from sklearn.metrics.pairwise import haversine_distances
 from math import radians
 from sklearn.cluster import KMeans
 import datetime
@@ -27,11 +23,9 @@ df_xy_time = df[['Latitude', 'Longitude', 'X Coordinate', 'Y Coordinate', 'Cont 
 
 clusters = pd.DataFrame(dfdf)
 
-#for day in range(7):
+
 for hour in range(24):
-    #df_jday = df_xy_time[df_xy_time['WeekDay'] == day]
     df_jday = df_xy_time[df_xy_time['Hour'] == hour]
-    #df_jday = df_jday[df_jday['Hour'] == hour]
     xy = df_jday[['X Coordinate', 'Y Coordinate']]
     df_jday = df_jday[['Latitude', 'Longitude']]
     db = OPTICS(metric='haversine', max_eps=0.1524, min_cluster_size=50, algorithm='ball_tree').fit(df_jday.to_numpy())
@@ -50,7 +44,7 @@ for hour in range(24):
                  "X_center": kmeans.cluster_centers_[0][0], "Y_center": kmeans.cluster_centers_[0][1],
                  "time_center": clus['Minute'].astype(int).mean()}
             clusters = clusters.append(d, ignore_index=True)
-    plt.show()
+    #plt.show()
 
 clusters = clusters.sort_values(by="amount_inside", ascending=False)
 first_30 = clusters[:30]
@@ -58,4 +52,9 @@ first_30 = clusters[:30]
 first_30['Time'] = first_30.apply( lambda x : datetime.time(int(x["hour"]), int(x["time_center"])), axis=1)
 first_30 = first_30[["X_center", "Y_center", "Time"]]
 
-print("h")
+first_30["X_center"] = first_30.apply( lambda x: int(x["X_center"]), axis=1)
+first_30["Y_center"] = first_30.apply( lambda y: int(y["Y_center"]), axis=1)
+
+print(first_30)
+result = first_30.apply( lambda x: (x["X_center"], x["Y_center"], x["Time"]), axis=1).to_numpy()
+print(result)
