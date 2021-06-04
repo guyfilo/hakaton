@@ -22,6 +22,8 @@ class BayesNaive:
 
 
     def predict(self, x):
+        if not x:
+            return 0.2 * np.ones(5)
         words = re.split("[^A-Za-z]", x)
         words = [self.d[word] if word in self.d.keys() else 0.2 * np.ones(5) for word in words]
         return pd.Series(np.average(words, axis=0))

@@ -1,7 +1,7 @@
 import datetime
 import pandas as pd
-
-
+import pickle
+from preprocess import  *
 def send_police_cars(date):
     date = pd.to_datetime(date)
     result = \
@@ -36,4 +36,15 @@ def send_police_cars(date):
          (1166487, 1940343, datetime.datetime(date.year, date.day, date.month, 9, 14, 0).isoformat()),
          (1174956, 1832160, datetime.datetime(date.year, date.day, date.month, 8, 11, 0).isoformat())]
     return result
+
+
+def predict(test_path):
+    tree_file = open("pickle tree", "rb")
+    parser_file = open("pickle Kn", "rb")
+    test_data = pd.read_csv(test_path)
+    tree = pickle.load(tree_file)
+    parser = pickle.load(parser_file)
+    X = parser.load_new_features(test_data, False)
+    return tree.predict(X)
+
 

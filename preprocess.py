@@ -1,16 +1,9 @@
-import pandas as pd
-import numpy as np
-import matplotlib.pyplot as plt
-import sklearn.model_selection
-import sklearn.tree as tr
-from location_filter import *
 import sklearn.ensemble as en
-import sklearn.tree as tr
-from sklearn.neighbors import KNeighborsClassifier
 from location_filter import *
-from sklearn.linear_model import LogisticRegression
 from BaiseNaive import *
 from BlockRate import *
+import pickle
+
 
 K_LOCATIONS = 50
 K_TIMES = 100
@@ -29,7 +22,9 @@ class PreProcessing:
         self.ld_prob = BayesNaive(self.training_data, 'Location Description')
         self.blockRate = BlockRate(training_data)
 
-    def basic_pre_processing(self, df):
+    def basic_pre_processing(self, df, istraining=True):
+        if istraining:
+            df['Primary Type'] = df['Primary Type'].apply(lambda x: values[x])
         df.dropna(inplace=True)
         time = pd.to_datetime(df['Date'], errors='coerce')
         df['DayTime'] = time.dt.hour + (time.dt.minute / 60)
@@ -42,22 +37,21 @@ class PreProcessing:
         df['Block_val'] = df['Block'].apply(self.calac_by_bloc)
         df.drop(columns=['Date', 'IUCR', 'FBI Code', 'Description', 'Case Number', 'Updated On',
                          'Location', 'ID', 'Ward'], inplace=True)
-        df['Primary Type'] = df['Primary Type'].apply(lambda x: values[x])
         return df
 
     def load_new_features(self, data, is_training):
         if is_training:
+            response_vector = data['Primary Type']
             for prob in self.prob_feature:
                 prob.fit(data)
         else:
-            data = self.basic_pre_processing(data)
+            data = self.basic_pre_processing(data, False)
             self.ld_prob.add_features(data)
             self.blockRate.add_features(data)
         for prob in self.prob_feature:
             prob.add_features(data)
-        response_vector = data['Primary Type']
         data.drop(
-            columns=['Block', 'X Coordinate', 'Y Coordinate', 'DayTime', 'Beat', 'Primary Type', 'Location Description',
+            columns=['Block', 'X Coordinate', 'Y Coordinate', 'DayTime', 'Beat', 'Location Description',
                      'Longitude', 'Latitude'],
             inplace=True)
         if not is_training:
@@ -67,7 +61,10 @@ class PreProcessing:
                 data[c] = 0
             # Ensure the order of column in the test set is in the same order than in train set
             data = data[self.training_data.columns]
-        return data, response_vector
+        if is_training:
+            data.drop(columns=['Primary Type'], inplace=True)
+            return data, response_vector
+        return data
 
     def calac_by_bloc(self, block):
         n = int(block[:3])
@@ -76,12 +73,12 @@ class PreProcessing:
 
 
 if __name__ == '__main__':
-    train = pd.read_csv('training set', index_col=0)
+    train = pd.read_csv('data', index_col=0)
     data_pro = PreProcessing(train)
     X, y = data_pro.load_new_features(data_pro.training_data, True)
-    print("finish training")
-    val = pd.read_csv('test set', index_col=0)
-    print(X.shape)
-    Xv, yv = data_pro.load_new_features(val, False)
     tree = en.RandomForestClassifier(n_estimators=200, max_depth=20)
     tree.fit(X, y)
+    file_1 = open("pickle tree","wb")
+    pickle.dump(tree,file_1)
+    file_2 = open("pickle Kn", "wb")
+    pickle.dump(data_pro, file_2)
