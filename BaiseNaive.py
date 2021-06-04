@@ -5,8 +5,8 @@ values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 
 
 class BayesNaive:
 
-    def __init__(self, data, param_name, split=True):
-        self.big_bag = pd.Series([y for x in data[param_name].values.astype(str).flatten() for y in
+    def __init__(self, data, param_name="Location Description", split=True):
+        """self.big_bag = pd.Series([y for x in data[param_name].values.astype(str).flatten() for y in
                                   re.split('[^A-Za-z]', x)]).value_counts().drop([''])
         self.param_name = param_name
         d = {word: np.zeros(5) for word in self.big_bag.keys()}
@@ -15,8 +15,9 @@ class BayesNaive:
             local_bag = pd.Series([y for x in data_prime['Location Description'].values.astype(str).flatten() for y in
                                    re.split('[^A-Za-z]', x)]).value_counts().drop([''])
             for key in local_bag.keys():
-                d[key][j] = local_bag[key] / self.big_bag[key]
-        self.d = pd.DataFrame(data=d)
+                d[key][j] = local_bag[key] / self.big_bag[key]"""
+        self.param_name = param_name
+        self.d = pd.read_csv("words frequency")
         self.add_features(data)
 
 
@@ -25,15 +26,6 @@ class BayesNaive:
         words = [self.d[word] if word in self.d.keys() else 0.2 * np.ones(5) for word in words]
         return pd.Series(np.average(words, axis=0))
 
-    """maxes = {word: np.zeros(2) for word in words}
-    local_df = pd.DataFrame(maxes)
-    for word in words:
-        if word in self.d.keys():
-            local_df[word][0] = np.argmax(self.d[word])
-            local_df[word][1] = self.d[maxes][maxes[0]]
-    if np.count_nonzero(local_df[:, 1] > 0) > 0:
-        return local_df.idxmax(axis=1)[1]
-    return np.random.randint(0, 4)"""
 
     def add_features(self, data):
         data[f"{self.param_name} 0"] = False
@@ -50,9 +42,10 @@ class BayesNaive:
         y_hat = X.apply(self.predict)
         return np.count_nonzero(y == y_hat) / len(y)
 
+
 if __name__ == '__main__':
     print("lpadlp")
-    X = pd.read_csv("training set", index_col=0)
+    X = pd.read_csv("data", index_col=0)
     X['Primary Type'] = X['Primary Type'].apply(lambda x: values[x])
     X.dropna(inplace=True)
     b = BayesNaive(X, 'Location Description')

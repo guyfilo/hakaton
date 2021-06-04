@@ -2,6 +2,7 @@
 import numpy.linalg as lin
 import pandas as pd
 import matplotlib.pyplot as plt
+import matplotlib.colors as colors
 import numpy as np
 
 def check_result(result, data, date):
@@ -31,10 +32,4 @@ def check(p1):
 
 
 if __name__ == '__main__':
-    X = pd.read_csv("training set")
-    X['time'] = pd.to_datetime(X['Date'], errors='coerce')
-    x = X.iloc[0]
 
-    result = [(x["X Coordinate"], x["Y Coordinate"], x["time"])]
-    print(x["time"].date())
-    print(check_result(result, X, x["time"].date()))
