@@ -8,6 +8,7 @@ import  sklearn.ensemble as en
 from preprocess import *
 from sklearn.ensemble import BaggingClassifier
 from location_filter import *
+from sklearn.model_selection import GridSearchCV
 
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
@@ -24,15 +25,14 @@ if __name__ == '__main__':
     X, y = data_pro.load_new_features(data_pro.training_data, True)
     val = pd.read_csv('test set')
     Xv, yv = data_pro.load_new_features(val, False)
-    tree = BaggingClassifier(tr.DecisionTreeClassifier(max_depth=20), n_estimators=66)
-    tree.fit(X, y)
-    print(tree.score(X, y))
-    print(tree.score(Xv, yv))
-    rand_forest = en.RandomForestClassifier(n_estimators=200)
+    print(X.shape)
+    rand_forest = en.RandomForestClassifier(n_estimators=200,max_depth=20)
     rand_forest.fit(X, y)
     print("rnd forest")
     print(rand_forest.score(X, y))
     print(rand_forest.score(Xv, yv))
+
+
 
 
 # See PyCharm help at https://www.jetbrains.com/help/pycharm/

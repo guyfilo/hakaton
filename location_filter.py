@@ -7,39 +7,25 @@ from sklearn.neighbors import KNeighborsClassifier
 training_set_locations = []
 values = {"BATTERY": 0, "THEFT": 1, "CRIMINAL DAMAGE": 2, "DECEPTIVE PRACTICE": 3, "ASSAULT": 4}
 
+from math import radians, cos, sin, asin, sqrt
 
-def change_data(training):
-    training.dropna(inplace=True)
-    response_vector = training['Primary Type'].apply(lambda x: values[x]).to_numpy()
-    loaction_x = training['X Coordinate'].to_numpy()
-    loaction_y = training['Y Coordinate'].to_numpy()
-    locations = np.append(np.array([loaction_y]).T, np.array([loaction_x]).T, 1)
-    k_neighbors = KNeighborsClassifier(n_neighbors=20)
-    k_neighbors = KNeighborsClassifier(n_neighbors=1, algorithm='ball_tree')
-    k_neighbors.fit(locations, response_vector)
-    return k_neighbors,locations
 
-def nearest_time(data_frame):
-    data_frame.dropna(inplace=True)
-    response_vector = data_frame['Primary Type'].apply(lambda x: values[x]).to_numpy()
-    time = pd.to_datetime(data_frame['Date'], errors='coerce')
-    print(time)
-    time = time.dt.hour + (time.dt.minute / 60)
-    print(np.array([time]).T)
-    time = np.array([time]).T
-    k_neighbors = KNeighborsClassifier(n_neighbors=20, algorithm='ball_tree')
-    k_neighbors.fit(time, response_vector)
-    return k_neighbors, time, response_vector
+def haversine(a, b):
+    """
+    Calculate the great circle distance between two points
+    on the earth (specified in decimal degrees)
+    """
+    # convert decimal degrees to radians
+    lon1, lat1, lon2, lat2 = a[0], a[1], b[0], b[1]
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-def create_list(data, training):
-    l, location = change_data(training)
-    x = l.predict_proba(location)
-    data['Propability_location_based_B'] = x[:, 0]
-    data['Propability_location_based_T'] = x[:, 1]
-    data['Propability_location_based_C'] = x[:, 2]
-    data['Propability_location_based_D'] = x[:, 3]
-    data['Propability_location_based_A'] = x[:, 4]
-    return data
+    # haversine formula
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(dlon / 2) ** 2
+    c = 2 * asin(sqrt(a))
+    r = 6371  # Radius of earth in kilometers. Use 3956 for miles
+    return c * r
 
 
 class ProbFeature:
@@ -58,7 +44,10 @@ class ProbFeature:
         self.label_map = {w: i for i, w in enumerate(training_data[self.feature_label].unique())}
         response_vector = training_data[self.feature_label].apply(lambda x: self.label_map[x])
         X = training_data[self.features]
-        k_neighbors = KNeighborsClassifier(n_neighbors=self.k, algorithm='ball_tree', radius=500)
+        if (self.column_title == "log"):
+            k_neighbors = KNeighborsClassifier(n_neighbors=10, metric=lambda a, b: haversine(a, b))
+        else:
+            k_neighbors = KNeighborsClassifier(n_neighbors=self.k, algorithm='kd_tree')
         k_neighbors.fit(X, response_vector)
         self.location_model = k_neighbors
 
@@ -69,19 +58,5 @@ class ProbFeature:
 
 
 if __name__ == '__main__':
-    df_train = pd.read_csv('training set')
-    df_val = pd.read_csv('validation set')
-    df_train.dropna(inplace=True)
-    df_val.dropna(inplace=True)
-    location_knn = ProbFeature(['X Coordinate', 'Y Coordinate'], 'location')
-    location_knn.fit(df_train)
-    location_knn.add_features(df_val)
-
-
-
-
-
-
-
-
-
+    a = haversine([-87.642811511,41.706219652],[-87.703428872,41.963590636])
+    print(a)
