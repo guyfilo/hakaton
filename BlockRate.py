@@ -20,6 +20,11 @@ class BlockRate:
         self.add_features(data)
 
     def add_features(self, data):
+        data[f"{self.param_name} 0"] = False
+        data[f"{self.param_name} 1"] = False
+        data[f"{self.param_name} 2"] = False
+        data[f"{self.param_name} 3"] = False
+        data[f"{self.param_name} 4"] = False
         data[[f"{self.param_name} 0", f"{self.param_name} 1",
               f"{self.param_name} 2", f"{self.param_name} 3",
               f"{self.param_name} 4"]] = np.array(data[self.param_name].apply(

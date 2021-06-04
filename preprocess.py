@@ -76,25 +76,12 @@ class PreProcessing:
 
 
 if __name__ == '__main__':
-    result_test = []
-    result_pre = []
-    for k in [1, 10, 25, 75, 100, 150]:
-        K_LOCATIONS = k
-        train = pd.read_csv('training set', index_col=0)
-        data_pro = PreProcessing(train)
-        X, y = data_pro.load_new_features(data_pro.training_data, True)
-        print("finish training")
-        val = pd.read_csv('test set', index_col=0)
-        print(X.shape)
-        Xv, yv = data_pro.load_new_features(val, False)
-        print("finish vl")
-        tree = en.RandomForestClassifier(n_estimators=200, max_depth=15)
-        tree.fit(X, y)
-        result_pre.append(tree.score(X, y))
-        result_test.append(tree.score(Xv, yv))
-    plt.plot([1, 10, 25, 75, 100, 150], result_test, label="training test pro")
-    plt.plot([1, 10, 25, 75, 100, 150], result_pre, label="training set pro")
-    plt.legend()
-    plt.xlabel("K in NH when adding features X,Y")
-    plt.ylabel("Score")
-    plt.show()
+    train = pd.read_csv('training set', index_col=0)
+    data_pro = PreProcessing(train)
+    X, y = data_pro.load_new_features(data_pro.training_data, True)
+    print("finish training")
+    val = pd.read_csv('test set', index_col=0)
+    print(X.shape)
+    Xv, yv = data_pro.load_new_features(val, False)
+    tree = en.RandomForestClassifier(n_estimators=200, max_depth=20)
+    tree.fit(X, y)
