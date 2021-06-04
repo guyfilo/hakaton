@@ -8,7 +8,7 @@ import datetime
 
 colors_array = [v for v in colors.cnames.keys()]
 
-df = pd.read_csv("training set")
+df = pd.read_csv("data")
 df.dropna(inplace=True)
 df.drop(columns=['IUCR', 'FBI Code', 'Location', 'Ward', 'Primary Type', 'Block', 'Year', 'FBI Code'], inplace=True)
 df['Latitude'] = df['Latitude'].apply(radians)
@@ -44,7 +44,7 @@ for hour in range(24):
                  "X_center": kmeans.cluster_centers_[0][0], "Y_center": kmeans.cluster_centers_[0][1],
                  "time_center": clus['Minute'].astype(int).mean()}
             clusters = clusters.append(d, ignore_index=True)
-    #plt.show()
+    plt.show()
 
 clusters = clusters.sort_values(by="amount_inside", ascending=False)
 first_30 = clusters[:30]
@@ -55,6 +55,5 @@ first_30 = first_30[["X_center", "Y_center", "Time"]]
 first_30["X_center"] = first_30.apply( lambda x: int(x["X_center"]), axis=1)
 first_30["Y_center"] = first_30.apply( lambda y: int(y["Y_center"]), axis=1)
 
-print(first_30)
+
 result = first_30.apply( lambda x: (x["X_center"], x["Y_center"], x["Time"]), axis=1).to_numpy()
-print(result)
